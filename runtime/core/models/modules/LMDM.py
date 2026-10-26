@@ -89,11 +89,14 @@ class LMDM(nn.Module):
     def setup(self, sampling_timesteps=50):
         if self.sampling_timesteps == sampling_timesteps:
             return
-        
+
         self.sampling_timesteps = sampling_timesteps
 
         total_timesteps = self.n_timestep
         device = self.device
+        if device.startswith("cuda") and not torch.cuda.is_available():
+            device = "cpu"
+            self.device = device
         eta = 1
         shape = (1, self.seq_frames, self.motion_feat_dim)
 

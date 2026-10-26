@@ -26,7 +26,7 @@ class MotionExtractor:
         """
         outputs = {}
         with torch.no_grad(), torch.autocast(
-            device_type=self.device[:4], dtype=torch.float16, enabled=True
+            device_type=self.device[:4], dtype=torch.float16, enabled=(self.device != "cpu")
         ):
             pred = self.model(torch.from_numpy(image).to(self.device))
             for i, name in enumerate(self.output_names):

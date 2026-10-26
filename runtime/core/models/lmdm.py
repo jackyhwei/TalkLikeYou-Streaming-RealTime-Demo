@@ -5,6 +5,9 @@ from ..utils.load_model import load_model
 
 class LMDM:
     def __init__(self, model_path, device="cuda", **kwargs):
+        import torch
+        if device.startswith("cuda") and not torch.cuda.is_available():
+            device = "cpu"
         kwargs["module_name"] = "LMDM"
         self.model = load_model(model_path, device=device, **kwargs)
         self.device = device

@@ -18,10 +18,10 @@ class Decoder:
             else torch.from_numpy(feature).to(self.device)
         )
         with torch.inference_mode(), torch.autocast(
-            device_type=self.device[:4], dtype=torch.float16, enabled=True
+            device_type=self.device[:4], dtype=torch.float16, enabled=(self.device != "cpu")
         ):
             pred = self.model(tensor).float().cpu().numpy()
-        
+
         pred = np.transpose(pred[0], [1, 2, 0]).clip(0, 1) * 255    # [h, w, c]
-        
+
         return pred

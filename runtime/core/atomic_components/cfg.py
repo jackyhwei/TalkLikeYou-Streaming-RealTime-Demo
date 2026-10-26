@@ -24,6 +24,21 @@ def parse_cfg(cfg_pkl, data_root, replace_cfg=None):
             for kk, vv in v.items():
                 cfg[k][kk] = vv
 
+    # Force CPU mode when CUDA is unavailable or explicitly disabled
+    _force_cpu = os.environ.get("FORCE_CPU", "").lower() in ("1", "true", "yes")
+    _cuda_disabled = not os.environ.get("CUDA_VISIBLE_DEVICES", "0")
+    if _force_cpu or _cuda_disabled:
+        def _set_device_cpu(obj):
+            if isinstance(obj, dict):
+                if "device" in obj and isinstance(obj["device"], str) and obj["device"].startswith("cuda"):
+                    obj["device"] = "cpu"
+                for v in obj.values():
+                    _set_device_cpu(v)
+            elif isinstance(obj, list):
+                for item in obj:
+                    _set_device_cpu(item)
+        _set_device_cpu(cfg)
+
     base_cfg = cfg["base_cfg"]
     audio2motion_cfg = cfg["audio2motion_cfg"]
     default_kwargs = cfg["default_kwargs"]

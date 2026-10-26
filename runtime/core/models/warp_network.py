@@ -22,7 +22,7 @@ class WarpNetwork:
             self._cached_feature = torch.from_numpy(feature_3d).to(self.device)
             self._cached_feature_id = feature_id
         with torch.inference_mode(), torch.autocast(
-            device_type=self.device[:4], dtype=torch.float16, enabled=True
+            device_type=self.device[:4], dtype=torch.float16, enabled=(self.device != "cpu")
         ):
             pred = self.model(
                 self._cached_feature,

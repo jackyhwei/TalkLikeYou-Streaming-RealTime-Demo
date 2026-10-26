@@ -45,7 +45,7 @@ class Cropper(object):
         self.crop_cfg: CropConfig = kwargs.get("crop_cfg", None)
         device_id = kwargs.get("device_id", 0)
         flag_force_cpu = kwargs.get("flag_force_cpu", False)
-        if flag_force_cpu:
+        if flag_force_cpu or not torch.cuda.is_available():
             device = "cpu"
             face_analysis_wrapper_provider = ["CPUExecutionProvider"]
         else:
@@ -58,8 +58,8 @@ class Cropper(object):
                     device = "cuda"
                     face_analysis_wrapper_provider = ["CUDAExecutionProvider"]
             except Exception:
-                device = "cuda"
-                face_analysis_wrapper_provider = ["CUDAExecutionProvider"]
+                device = "cpu"
+                face_analysis_wrapper_provider = ["CPUExecutionProvider"]
         self.face_analysis_wrapper = FaceAnalysisDIY(
             model_paths=[
                 self.crop_cfg.detector_ckpt_path,
